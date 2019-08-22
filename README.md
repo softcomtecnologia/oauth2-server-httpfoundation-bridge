@@ -18,7 +18,7 @@ Installation
 ```
 {
     "require": {
-        "bshaffer/oauth2-server-httpfoundation-bridge": "v1.0",
+        "softcomtecnologia/oauth2-server-php": "v1.11.*",
         ...
     },
     ...

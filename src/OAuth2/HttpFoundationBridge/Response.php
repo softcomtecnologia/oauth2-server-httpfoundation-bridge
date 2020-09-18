@@ -1,15 +1,16 @@
 <?php
-
 namespace OAuth2\HttpFoundationBridge;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use OAuth2\ResponseInterface;
-
 /**
  *
  */
 class Response extends JsonResponse implements ResponseInterface
- {
+{
+    /**
+     * @param array $parameters
+     */
     public function addParameters(array $parameters)
     {
         // if there are existing parametes, add to them
@@ -20,40 +21,59 @@ class Response extends JsonResponse implements ResponseInterface
         // this will encode the php array as json data
         $this->setData($parameters);
     }
-
+    /**
+     * @param array $httpHeaders
+     */
     public function addHttpHeaders(array $httpHeaders)
     {
         foreach ($httpHeaders as $key => $value) {
             $this->headers->set($key, $value);
         }
     }
-
+    /**
+     * @param string $name
+     * @return mixed|null
+     */
     public function getParameter($name)
     {
         if ($this->content && $data = json_decode($this->content, true)) {
             return isset($data[$name]) ? $data[$name] : null;
         }
     }
-
+    /**
+     * @param int $statusCode
+     * @param string $error
+     * @param null $description
+     * @param null $uri
+     * @return mixed|void
+     */
     public function setError($statusCode, $error, $description = null, $uri = null)
     {
         $this->setStatusCode($statusCode);
         $this->addParameters(array_filter(array(
-            'error'             => $error,
+            'error' => $error,
             'error_description' => $description,
-            'error_uri'         => $uri,
+            'error_uri' => $uri,
         )));
     }
-
+    /**
+     * @param int $statusCode
+     * @param string $url
+     * @param null $state
+     * @param null $error
+     * @param null $errorDescription
+     * @param null $errorUri
+     * @return mixed|void
+     */
     public function setRedirect($statusCode = 302, $url, $state = null, $error = null, $errorDescription = null, $errorUri = null)
     {
         $this->setStatusCode($statusCode);
 
         $params = array_filter(array(
-            'state'             => $state,
-            'error'             => $error,
+            'state' => $state,
+            'error' => $error,
             'error_description' => $errorDescription,
-            'error_uri'         => $errorUri,
+            'error_uri' => $errorUri,
         ));
 
         if ($params) {
@@ -65,14 +85,13 @@ class Response extends JsonResponse implements ResponseInterface
 
         $this->headers->set('Location', $url);
     }
-
     /**
-     * @param int $statusCode
+     * @param int $code
      * @param null $text
-     * @return JsonResponse
+     * @return object
      */
-    public function setStatusCode(int $statusCode, $text = null)
+    public function setStatusCode(int $code, $text = null): object
     {
-        return parent::setStatusCode($statusCode);
+        return parent::setStatusCode($code);
     }
 }
